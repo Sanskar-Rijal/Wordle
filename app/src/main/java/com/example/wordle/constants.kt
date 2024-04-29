@@ -100,7 +100,7 @@ object constants {
         val question93 = questions("Abide", "To accept or act in accordance with a rule, decision, or recommendation.")
         val question94 = questions("Admin", "A person responsible for carrying out administrative work, typically in an office.")
         val question95 = questions("Dress", "put on one's clothes.")
-        val question96 = questions("Array", "An impressive display or range of a particular type of thing.")
+        val question96 = questions("Array", "Collection of similar data types,mainly used in programming")
         val question97 = questions("Basin", "A wide, round open container, especially one used for holding liquid.")
         val question98 = questions("Input", "what is put in, taken in, or operated on by any process or system.")
         val question99 = questions("Drift", "To be carried along by currents of air or water.")
@@ -307,6 +307,7 @@ object constants {
         questionlist.add(question149)
         questionlist.add(question150)
         questionlist.add(question151)
+        questionlist.shuffle()
         return questionlist
     }
 }

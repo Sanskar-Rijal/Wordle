@@ -3,8 +3,11 @@ package com.example.wordle
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.text.Editable
 import android.text.TextWatcher
+import android.text.WordSegmentFinder
+import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -12,15 +15,34 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import com.example.wordle.databinding.ActivityMainBinding
+import org.w3c.dom.Text
+import java.util.Locale
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var binding :ActivityMainBinding?=null
+    private var arraylistofquestions:ArrayList<questions>?=null
+    private var hint:String?=null
+    private  var WORD:String=""
+    private var bugfix:Boolean=true
+    /**
+     * using google text to speech for hints
+     */
+    private var tts:TextToSpeech?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //setContentView(R.layout.activity_main)
         supportActionBar?.hide()
         binding=ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding?.root)
+        arraylistofquestions=constants.getquestions()
+        if(bugfix) {
+            selectWord()
+           // bugfix=false
+        }
+        /**
+         * implementing tts in mainactivit
+         */
+        tts= TextToSpeech(this,this)
         makeGameInactive()
         binding?.mat11?.isEnabled=true
         binding?.mat12?.isEnabled=true
@@ -84,6 +106,15 @@ class MainActivity : AppCompatActivity() {
             binding?.mat64?.isEnabled=false
             binding?.mat65?.isEnabled=false
         }
+    }
+    override fun onPause() {
+        super.onPause()
+        backgroundmusic.pause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        backgroundmusic.resume()
     }
     private fun keeppassingfocus()
     {
@@ -150,6 +181,11 @@ class MainActivity : AppCompatActivity() {
             false // Let the event propagate if not backspace
         }
     }
+    private fun selectWord() {
+        val displayQuestion: questions = arraylistofquestions!!.random()
+        WORD = displayQuestion.question
+        hint = displayQuestion.hint
+    }
     private fun validateRow
                 (edt1:EditText?,
                  edt2:EditText?,
@@ -157,49 +193,51 @@ class MainActivity : AppCompatActivity() {
                  edt4:EditText?,
                  edt5:EditText?)
     {
+        bugfix=false
+        //setting up questions
         val edt1Text=edt1?.text.toString().uppercase()
         val edt2Text=edt2?.text.toString().uppercase()
         val edt3Text=edt3?.text.toString().uppercase()
         val edt4Text=edt4?.text.toString().uppercase()
         val edt5Text=edt5?.text.toString().uppercase()
-        val word1=WORD[0].toString()
-        val word2=WORD[1].toString()
-        val word3=WORD[2].toString()
-        val word4=WORD[3].toString()
-        val word5=WORD[4].toString()
+        val word1= WORD[0].toString().uppercase()
+        val word2= WORD[1].toString().uppercase()
+        val word3= WORD[2].toString().uppercase()
+        val word4= WORD[3].toString().uppercase()
+        val word5= WORD[4].toString().uppercase()
         /*
        grey when wrong ->#3a3a3c
        yellow:b59f3b
        green:#538d4e
          */
         when (edt1Text) {
-            word2, word3, word4, word5 -> {
-                edt1?.setBackgroundColor(Color.parseColor("#b59f3b"))
-            }
             word1 -> {
                 edt1?.setBackgroundColor(Color.parseColor("#538d4e"))
+            }
+            word2, word3, word4, word5 -> {
+                edt1?.setBackgroundColor(Color.parseColor("#b59f3b"))
             }
             else -> {
                 edt1?.setBackgroundColor(Color.parseColor("#3a3a3c"))
             }
         }
         when (edt2Text) {
-            word1, word3, word4, word5 -> {
-                edt2?.setBackgroundColor(Color.parseColor("#b59f3b"))
-            }
             word2 -> {
                 edt2?.setBackgroundColor(Color.parseColor("#538d4e"))
+            }
+            word1, word3, word4, word5 -> {
+                edt2?.setBackgroundColor(Color.parseColor("#b59f3b"))
             }
             else -> {
                 edt2?.setBackgroundColor(Color.parseColor("#3a3a3c"))
             }
         }
         when (edt3Text) {
-            word1, word2, word4, word5 -> {
-                edt3?.setBackgroundColor(Color.parseColor("#b59f3b"))
-            }
             word3 -> {
                 edt3?.setBackgroundColor(Color.parseColor("#538d4e"))
+            }
+            word1, word2, word4, word5 -> {
+                edt3?.setBackgroundColor(Color.parseColor("#b59f3b"))
             }
             else -> {
                 edt3?.setBackgroundColor(Color.parseColor("#3a3a3c"))
@@ -224,22 +262,22 @@ class MainActivity : AppCompatActivity() {
          *         }
          */
         when (edt4Text) {
-            word1, word3, word2, word5 -> {
-                edt4?.setBackgroundColor(Color.parseColor("#b59f3b"))
-            }
             word4 -> {
                 edt4?.setBackgroundColor(Color.parseColor("#538d4e"))
+            }
+            word1, word3, word2, word5 -> {
+                edt4?.setBackgroundColor(Color.parseColor("#b59f3b"))
             }
             else -> {
                 edt4?.setBackgroundColor(Color.parseColor("#3a3a3c"))
             }
         }
         when (edt5Text) {
-            word1, word3, word4, word2 -> {
-                edt5?.setBackgroundColor(Color.parseColor("#b59f3b"))
-            }
             word5 -> {
                 edt5?.setBackgroundColor(Color.parseColor("#538d4e"))
+            }
+            word1, word3, word4, word2 -> {
+                edt5?.setBackgroundColor(Color.parseColor("#b59f3b"))
             }
             else -> {
                 edt5?.setBackgroundColor(Color.parseColor("#3a3a3c"))
@@ -251,16 +289,20 @@ class MainActivity : AppCompatActivity() {
             edt4Text==word4 &&
             edt5Text==word5)
         {
-            binding?.lastMessage?.text= "Congratulation you guessed the word $WORD"
+            binding?.lastMessage?.text= "Congratulations, you guessed the word $WORD correctly."
             binding?.lastMessage?.visibility=View.VISIBLE
             Toast.makeText(this,"Congratulations you won",Toast.LENGTH_SHORT).show()
             //make gameinactive
             makeGameInactive()
             return
         }
+        else
+        {
+            speakOut("Your guess was incorrect, so I will give you a hint. The meaning of the word is"+"$hint")
+        }
         if(edt5?.id==R.id.mat_65)
         {
-            binding?.lastMessage?.text= "The word was $WORD"
+            binding?.lastMessage?.text= "You lost the word was $WORD"
             binding?.lastMessage?.visibility=View.VISIBLE
             Toast.makeText(this,"Better luck next time",Toast.LENGTH_SHORT).show()
             //make gameinactive
@@ -323,10 +365,6 @@ class MainActivity : AppCompatActivity() {
             // Add similar cases for other rows
         }
     }
-    companion object
-    {
-        private val WORD="APRIL"
-    }
     private fun makeGameInactive()
     {
         binding?.mat11?.isEnabled=false
@@ -364,5 +402,36 @@ class MainActivity : AppCompatActivity() {
         binding?.mat63?.isEnabled=false
         binding?.mat64?.isEnabled=false
         binding?.mat65?.isEnabled=false
+    }
+    //destroying since we used bindings
+    override fun onDestroy() {
+        super.onDestroy()
+        if(tts !=null)
+        {
+            tts?.stop()
+            tts?.shutdown()
+        }
+        binding=null
+    }
+
+    override fun onInit(status: Int) {
+        if(status== TextToSpeech.SUCCESS)
+        {
+            val result =tts!!.setLanguage(Locale.ENGLISH)
+            if(result==TextToSpeech.LANG_MISSING_DATA ||
+                result==TextToSpeech.LANG_NOT_SUPPORTED)
+            {
+                Log.e("TTS","The language specified is not supported")
+            }
+            tts?.setSpeechRate(0.8f)
+        }
+        else
+        {
+            Log.e("TTS","initialization failed")
+        }
+    }
+    private fun speakOut(text:String)
+    {
+        tts?.speak(text,TextToSpeech.QUEUE_FLUSH,null,"")
     }
 }

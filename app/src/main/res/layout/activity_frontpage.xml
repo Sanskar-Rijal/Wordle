@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".frontpage"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@color/black"
+    android:padding="10dp">
+    <TextView
+        android:id="@+id/tv_welcome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="WORDLE"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"
+
+        />
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:cardCornerRadius="15dp"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_margin="16dp"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Welcome"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:textSize="35sp"
+                android:textStyle="bold"
+                />
+            <TextView
+                android:layout_marginTop="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Enter you name!!!"
+                android:gravity="center"
+                android:textColor="#ADB5BD"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                />
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:contentDescription="enter your name"
+                >
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/text_entered"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="name: e.g Sans"
+                    android:inputType="textCapWords"
+                    android:textColor="#889696"
+                    android:textColorHint="#889696"
+                    tools:ignore="ContentDescription" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <Button
+                android:id="@+id/buttonstart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="START"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="@color/basic"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</LinearLayout>
