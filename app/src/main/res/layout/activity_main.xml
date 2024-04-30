@@ -450,5 +450,46 @@
         android:visibility="invisible"
         android:layout_below="@id/main_layout"
         />
+        <FrameLayout
+            android:id="@+id/fl_layout"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            android:layout_alignTop="@+id/last_message"
+            android:layout_marginTop="130dp"
+            android:background="@drawable/circular_start"
+            android:visibility="gone"
+            >
+            <ProgressBar
+                android:id="@+id/progressbar"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:progress="100"
+                android:rotation="-90"
+                android:max="10"
+                android:background="@drawable/background_progressbar"
+                android:progressDrawable="@drawable/progress_circular"
+                android:indeterminate="false"
+                />
+            <LinearLayout
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/linearlayout_background"
+                android:gravity="center"
+                android:layout_gravity="center"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvTimer"
+                    android:textColor="@color/white"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                    android:text="5"
+                    />
+            </LinearLayout>
+        </FrameLayout>
 </RelativeLayout>
 </ScrollView>

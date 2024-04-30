@@ -1,8 +1,12 @@
 package com.example.wordle
 
+import android.content.Context
+import android.content.Intent
 import android.graphics.Color
+import android.media.AudioManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.speech.tts.TextToSpeech
 import android.text.Editable
 import android.text.TextWatcher
@@ -20,6 +24,8 @@ import java.util.Locale
 
 class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var binding :ActivityMainBinding?=null
+    //bug fix for text to speech
+    private var count:Int=0
     private var arraylistofquestions:ArrayList<questions>?=null
     private var hint:String?=null
     private  var WORD:String=""
@@ -28,9 +34,16 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
      * using google text to speech for hints
      */
     private var tts:TextToSpeech?=null
+    //getting name of user
+    private var musername:String?=null
+
+    /** writting code for timer
+     */
+    private var resetTimer:CountDownTimer?=null
+    private var resetProgress:Int=0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //setContentView(R.layout.activity_main)
+       // setContentView(R.layout.activity_main)
         supportActionBar?.hide()
         binding=ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding?.root)
@@ -39,6 +52,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             selectWord()
            // bugfix=false
         }
+        musername=intent.getStringExtra(constants.user_name)
         /**
          * implementing tts in mainactivit
          */
@@ -194,6 +208,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                  edt5:EditText?)
     {
         bugfix=false
+        count++
         //setting up questions
         val edt1Text=edt1?.text.toString().uppercase()
         val edt2Text=edt2?.text.toString().uppercase()
@@ -289,29 +304,27 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             edt4Text==word4 &&
             edt5Text==word5)
         {
-            binding?.lastMessage?.text= "Congratulations, you guessed the word $WORD correctly."
+            binding?.lastMessage?.text= "Congratulations $musername,You guessed the word $WORD correctly."
             binding?.lastMessage?.visibility=View.VISIBLE
-            Toast.makeText(this,"Congratulations you won",Toast.LENGTH_SHORT).show()
+            Toast.makeText(this,"Chill for a sec. Once the timer's done, you're back in the game",Toast.LENGTH_LONG).show()
             //make gameinactive
             makeGameInactive()
-            return
+            binding?.flLayout?.visibility=View.VISIBLE
+            setupResetView()
+            count=6
         }
-        else
-        {
-            speakOut("Your guess was incorrect, so I will give you a hint. The meaning of the word is"+"$hint")
+        if(count<6) {
+            speakOut("Your guess was incorrect, so I will give you a hint. The meaning of the word is" + "$hint")
+            moveCursorToNextEditText(edt5)
         }
         if(edt5?.id==R.id.mat_65)
         {
-            binding?.lastMessage?.text= "You lost the word was $WORD"
+            binding?.lastMessage?.text= "$musername you lost,the word was $WORD"
             binding?.lastMessage?.visibility=View.VISIBLE
-            Toast.makeText(this,"Better luck next time",Toast.LENGTH_SHORT).show()
+            Toast.makeText(this,"Chill for a sec. Once the timer's done, you're back in the game",Toast.LENGTH_LONG).show()
             //make gameinactive
-            makeGameInactive()
-            return
-        }
-        else
-        {
-            moveCursorToNextEditText(edt5)
+            binding?.flLayout?.visibility=View.VISIBLE
+            setupResetView()
         }
     }
 
@@ -411,17 +424,21 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             tts?.stop()
             tts?.shutdown()
         }
+        if(resetTimer!=null)
+        {
+            resetTimer?.cancel()
+            resetProgress=0
+        }
         binding=null
     }
 
     override fun onInit(status: Int) {
-        if(status== TextToSpeech.SUCCESS)
-        {
-            val result =tts!!.setLanguage(Locale.ENGLISH)
-            if(result==TextToSpeech.LANG_MISSING_DATA ||
-                result==TextToSpeech.LANG_NOT_SUPPORTED)
-            {
-                Log.e("TTS","The language specified is not supported")
+        if(status== TextToSpeech.SUCCESS) {
+            val result = tts!!.setLanguage(Locale.ENGLISH)
+            if (result == TextToSpeech.LANG_MISSING_DATA ||
+                result == TextToSpeech.LANG_NOT_SUPPORTED
+            ) {
+                Log.e("TTS", "The language specified is not supported")
             }
             tts?.setSpeechRate(0.8f)
         }
@@ -433,5 +450,36 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private fun speakOut(text:String)
     {
         tts?.speak(text,TextToSpeech.QUEUE_FLUSH,null,"")
+    }
+    /**
+     * setting up functions for timers
+     */
+    private fun setupResetView()
+    {
+        if(resetTimer !=null)
+        {
+            resetTimer?.cancel()
+            resetProgress=0
+        }
+        setRestProgressBar()
+    }
+    private fun setRestProgressBar()
+    {
+        binding?.progressbar?.progress=resetProgress
+        resetTimer=object :CountDownTimer(10000,1000)
+        {
+            override fun onTick(millisUntilFinished: Long) {
+                binding?.progressbar?.progress=10-resetProgress
+                binding?.tvTimer?.text=(10-resetProgress).toString()
+                resetProgress++
+            }
+
+            override fun onFinish() {
+                val intent =Intent(this@MainActivity,frontpage::class.java)
+                startActivity(intent)
+                finish()
+            }
+
+        }.start()
     }
 }

@@ -13,7 +13,7 @@ object backgroundmusic {
         {
             mediaPlayer=MediaPlayer.create(contex.applicationContext,resid)
             mediaPlayer?.start()
-            mediaPlayer?.setVolume(0.3f,0.3f)
+            mediaPlayer?.setVolume(0.2f,0.2f)
             mediaPlayer?.isLooping=true
         }
     }

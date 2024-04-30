@@ -19,6 +19,7 @@ class frontpage : AppCompatActivity() {
             if(binding?.textEntered?.text!!.isNotEmpty())
             {
                 val change =Intent(this,MainActivity::class.java)
+                change.putExtra(constants.user_name,binding?.textEntered?.text.toString())
                 startActivity(change)
                 finish()
             }
