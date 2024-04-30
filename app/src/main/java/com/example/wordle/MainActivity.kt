@@ -312,6 +312,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             binding?.flLayout?.visibility=View.VISIBLE
             setupResetView()
             count=6
+            return
         }
         if(count<6) {
             speakOut("Your guess was incorrect, so I will give you a hint. The meaning of the word is" + "$hint")
